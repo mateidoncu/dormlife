@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import { signUp } from "next-auth-sanity/client";
 import { ChangeEvent, FormEvent, useState } from "react";
 import toast from "react-hot-toast";
@@ -41,8 +42,10 @@ const Auth = () => {
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <Link href="/">
-            <img
+            <Image
                 className="mx-auto h-10 w-auto"
+                height={500}
+                width={500}
                 src="/logo-dark.svg"
                 alt="DormLife"
             />
