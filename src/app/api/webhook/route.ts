@@ -29,14 +29,20 @@ export async function POST(req: Request, res: Response) {
       const session = event.data.object;
 
       const {
-        // @ts-ignore
         metadata: {
+          // @ts-ignore
           people,
+          // @ts-ignore
           contractStartDate,
+          // @ts-ignore
           contractEndDate,
+          // @ts-ignore
           dormRoom,
+          // @ts-ignore
           numberOfMonths,
+          // @ts-ignore
           user,
+          // @ts-ignore
           price,
         },
       } = session;

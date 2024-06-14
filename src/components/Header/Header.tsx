@@ -7,6 +7,7 @@ import { FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 
 function classNames(...classes: string[]) {
@@ -48,10 +49,12 @@ const Header = () => {
                     <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                         <div className="flex flex-shrink-0 items-center">
                         <Link href="/">
-                        <img
+                        <Image
                             className="h-8 w-auto"
                             src="/logo-dark.svg"
                             alt="DormLife"
+                            width={500}
+                            height={500}
                         />
                         </Link>
                         </div>

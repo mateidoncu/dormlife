@@ -2,7 +2,7 @@
 
 import { FC, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createMaintenanceRequest, sendNotification } from '@/libs/api';
+// import { createMaintenanceRequest, sendNotification } from '@/libs/api';
 import { useSession } from 'next-auth/react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -17,15 +17,15 @@ const CreateMaintenanceRequest: FC = () => {
     e.preventDefault();
     if (!session?.user || !selectedDate) return;
 
-    const newRequest = await createMaintenanceRequest({
-      roomId: 'room-id',
-      description,
-      status: 'pending',
-      user: session.user.id,
-      selectedDate: selectedDate.toISOString()
-    });
-    await sendNotification('admin-id', `New maintenance request created for ${selectedDate}`);
-    router.push('/maintenance');
+    // const newRequest = await createMaintenanceRequest({
+    //   roomId: 'room-id',
+    //   description,
+    //   status: 'pending',
+    //   user: session.user.id,
+    //   selectedDate: selectedDate.toISOString()
+    // });
+    // await sendNotification('admin-id', `New maintenance request created for ${selectedDate}`);
+    // router.push('/maintenance');
   };
 
   return (
