@@ -26,7 +26,7 @@ const CreateTicket: FC<Props> = props => {
                 <div className="pb-6">
                     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
                         <div className="sm:col-span-4">
-                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                            <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
                                 Title
                             </label>
                             <div className="mt-2">

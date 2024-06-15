@@ -4,6 +4,7 @@ import sanityClient from "./sanity";
 import * as queries from "./sanityQueries";
 import axios from 'axios';
 import { CreateTicketDTO, Ticket, UpdateTicketDTO } from "@/models/ticket";
+import { MaintenanceRequest, CreateMaintenanceRequestDTO, UpdateMaintenanceRequestDTO } from '@/models/maintenance';
 
 export async function getRooms() {
     const result = await sanityClient.fetch<Room[]>(
@@ -189,3 +190,17 @@ export async function getTickets(userId: string) {
 
   return result;
 }
+
+
+export const getMaintenanceRequests = async (): Promise<MaintenanceRequest[]> => {
+  const { data } = await axios.get('/api/maintenance');
+  return data;
+};
+
+export const createMaintenanceRequest = async (request: CreateMaintenanceRequestDTO): Promise<void> => {
+  await axios.post('/api/maintenance', request);
+};
+
+export const respondToMaintenanceRequest = async (requestId: string, response: string): Promise<void> => {
+  await axios.patch(`/api/maintenance/${requestId}`, { response });
+};
