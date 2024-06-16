@@ -47,6 +47,7 @@ const TicketsPage = () => {
         ticketTitle,
         userId,
       });
+      console.log(data);
       toast.success('Ticket Submitted');
     } catch (error) {
       toast.error('Ticket Failed');
