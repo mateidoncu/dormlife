@@ -64,4 +64,20 @@ export const getTicketsQuery = groq`*[_type == "ticket" && user._ref == $userId]
       name
     },
 }`;
+
+export const getMaintenanceQuery = groq`*[_type == "maintenance" && user._ref == $userId && rent._ref == $rentId] {
+    _createdAt,
+    _id,
+    reason,
+    scheduledDate,
+    status,
+    updatedAt,
+    user -> {
+      name
+    },
+    rent -> {
+      _id,
+    },
+}`;
+
   

@@ -106,6 +106,7 @@ export async function getUserData(userId: string) {
 export async function checkTicketExists(
   userId: string,
 ): Promise<null | { _id: string }> {
+  console.log('[API] Checking if ticket exists for user:', userId);
   const query = `*[_type == 'ticket' && user._ref == $userId][0] {
     _id
   }`;
@@ -115,7 +116,7 @@ export async function checkTicketExists(
   };
 
   const result = await sanityClient.fetch(query, params);
-
+  console.log('[API] Check ticket exists result:', result);
   return result ? result : null;
 }
 
@@ -138,13 +139,19 @@ export const updateTicket = async ({
     ],
   };
 
-  const { data } = await axios.post(
-    `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
-    mutation,
-    { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_SANITY_TOKEN}` } }
-  );
-
-  return data;
+  console.log('[API] Updating ticket with mutation:', JSON.stringify(mutation, null, 2));
+  try {
+    const { data } = await axios.post(
+      `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
+      mutation,
+      { headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+    );
+    console.log('[API] Ticket updated:', data);
+    return data;
+  } catch (error: any) {
+    console.error('[API] Error updating ticket:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const createTicket = async ({
@@ -170,13 +177,19 @@ export const createTicket = async ({
     ],
   };
 
-  const { data } = await axios.post(
-    `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
-    mutation,
-    { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_SANITY_TOKEN}` } }
-  );
-
-  return data;
+  console.log('[API] Creating ticket with mutation:', JSON.stringify(mutation, null, 2));
+  try {
+    const { data } = await axios.post(
+      `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
+      mutation,
+      { headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+    );
+    console.log('[API] Ticket created:', data);
+    return data;
+  } catch (error: any) {
+    console.error('[API] Error creating ticket:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export async function getTickets(userId: string) {
@@ -192,15 +205,107 @@ export async function getTickets(userId: string) {
 }
 
 
-export const getMaintenanceRequests = async (): Promise<MaintenanceRequest[]> => {
-  const { data } = await axios.get('/api/maintenance');
-  return data;
+export async function checkMaintenanceExists(
+  userId: string,
+): Promise<null | { _id: string }> {
+  console.log('[API] Checking if maintenance request exists for user:', userId);
+  const query = `*[_type == 'maintenance' && user._ref == $userId][0] {
+    _id
+  }`;
+
+  const params = {
+    userId,
+  };
+
+  const result = await sanityClient.fetch(query, params);
+  console.log('[API] Check maintenance request exists result:', result);
+  return result ? result : null;
+}
+
+export const updateMaintenanceRequest = async ({
+  maintenanceStatus,
+  maintenanceId,
+}: UpdateMaintenanceRequestDTO) => {
+  const mutation = {
+    mutations: [
+      {
+        patch: {
+          id: maintenanceId,
+          set: {
+            status: maintenanceStatus,
+            updatedAt: new Date().toISOString(),
+          },
+        },
+      },
+    ],
+  };
+
+  console.log('[API] Updating maintenance request with mutation:', JSON.stringify(mutation, null, 2));
+  try {
+    const { data } = await axios.post(
+      `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
+      mutation,
+      { headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+    );
+    console.log('[API] Maintenance request updated:', data);
+    return data;
+  } catch (error: any) {
+    console.error('[API] Error updating maintenance request:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
-export const createMaintenanceRequest = async (request: CreateMaintenanceRequestDTO): Promise<void> => {
-  await axios.post('/api/maintenance', request);
+export const createMaintenanceRequest = async ({
+  maintenanceDate,
+  maintenanceReason,
+  userId,
+  rentId,
+}: CreateMaintenanceRequestDTO) => {
+  const mutation = {
+    mutations: [
+      {
+        create: {
+          _type: 'maintenance',
+          scheduledDate: maintenanceDate,
+          user: {
+            _type: 'reference',
+            _ref: userId,
+          },
+          rent: {
+            _type: 'reference',
+            _ref: rentId,
+          },
+          reason: maintenanceReason,
+          status: 'open',
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    ],
+  };
+
+  console.log('[API] Creating maintenance request with mutation:', JSON.stringify(mutation, null, 2));
+  try {
+    const { data } = await axios.post(
+      `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
+      mutation,
+      { headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+    );
+    console.log('[API] Maintenance request created:', data);
+    return data;
+  } catch (error: any) {
+    console.error('[API] Error creating maintenance request:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
-export const respondToMaintenanceRequest = async (requestId: string, response: string): Promise<void> => {
-  await axios.patch(`/api/maintenance/${requestId}`, { response });
-};
+export async function getMaintenanceRequests(userId: string) {
+  const result = await sanityClient.fetch<MaintenanceRequest[]>(
+    queries.getMaintenanceQuery,
+    {
+      userId,
+    },
+    { cache: 'no-cache' }
+  );
+
+  return result;
+}

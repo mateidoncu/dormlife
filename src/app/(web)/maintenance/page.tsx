@@ -2,9 +2,11 @@
 
 import CreateMaintenanceRequest from '@/components/CreateMaintenance/CreateMaintenance';
 import ViewMaintenanceRequests from '@/components/ViewMaintenance/ViewMaintenance';
+import { getUserRents } from '@/libs/api';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
+import toast from 'react-hot-toast';
 import useSWR from 'swr';
 
 const fetchUserData = async () => {
@@ -12,14 +14,81 @@ const fetchUserData = async () => {
   return data;
 };
 
+const fetchUserRent = async () => {
+  const { data } = await axios.get('/api/userrent');
+  return data;
+}
 
-const Maintenance = () => {
-  
+const fetchMaintenanceRequests = async (url: string) => {
+  const { data } = await axios.get(url);
+  return data;
+};
+
+const MaintenancePage = () => {
   const [userId, setUserId] = useState<string | null>(null);
-
-  const { data: userData, error: userError } = useSWR('/api/users', fetchUserData, { onSuccess: (data) => setUserId(data._id) });
+  const [rentId, setRentId] = useState<string | null>(null);
+  const [maintenanceReason, setMaintenanceReason] = useState('');
+  const [maintenanceDate, setMaintenanceDate] = useState<Date | null>(null);
   
   const { data: session } = useSession();
+  
+  const { data: userData, error: userError } = useSWR('/api/users', fetchUserData, {
+    onSuccess: (data) => setUserId(data._id) 
+  });
+
+  const { data: rentData, error: rentError } = useSWR('/api/userrent', fetchUserRent, {
+    onSuccess: (data) => {
+      console.log('Fetched rent data:', data);
+      if (data.length > 0) {
+        setRentId(data[0]._id);
+      }
+    }
+  });
+
+  const { data: maintenanceRequests, error: maintenanceRequestsError } = useSWR(
+    userData?.isAdmin ? '/api/maintenance' : null,
+    fetchMaintenanceRequests
+  );
+
+  const submitHandler = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    console.log('[Client] Submitting maintenance request:', { maintenanceReason, maintenanceDate, userId });
+
+    if (!maintenanceReason.trim().length) {
+      toast.error('Please provide a reason');
+      return;
+    }
+
+    if (!userId) {
+      toast.error('User Id not provided');
+      return;
+    }
+
+    if (!rentId) {
+      console.log('Rent Data:', rentData);
+      toast.error('Rent Id not provided');
+      return;
+    }
+
+    try {
+      const { data } = await axios.post('/api/maintenance', {
+        maintenanceDate,
+        maintenanceReason,
+        userId,
+        rentId
+      });
+      console.log('[Client] Maintenance request created successfully:', data);
+      toast.success('Request Submitted');
+    } catch (error) {
+      console.error('[Client] Maintenance request creation failed:', error);
+      toast.error('Request Failed');
+    } finally {
+      setTimeout(() => {
+        setMaintenanceDate(null);
+        setMaintenanceReason('');
+      }, 2000);
+    }
+  };
 
   if (!session) {
     return (
@@ -46,16 +115,21 @@ const Maintenance = () => {
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
       {userData?.isAdmin ? (
-        <ViewMaintenanceRequests 
+        <ViewMaintenanceRequests
+          maintenanceRequests={maintenanceRequests}
+          error={maintenanceRequestsError}
         />
       ) : (
         <CreateMaintenanceRequest
+          maintenanceDate={maintenanceDate}
+          maintenanceReason={maintenanceReason}
+          setMaintenanceDate={setMaintenanceDate}
+          setMaintenanceReason={setMaintenanceReason}
+          submitHandler={submitHandler}
         />
       )}
-
     </div>
   )
 }
 
-export default Maintenance;
-
+export default MaintenancePage;

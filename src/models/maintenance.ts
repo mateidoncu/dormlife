@@ -1,22 +1,23 @@
-// models/maintenance.ts
 export type MaintenanceRequest = {
     _id: string;
     rent: { _id: string };
+    scheduledDate: Date;
     reason: string;
-    createdAt: string;
-    updatedAt: string;
-    status: 'pending' | 'in-progress' | 'completed';
+    _createdAt: Date;
+    updatedAt: Date;
+    status: string;
     user: { name: string };
   };
   
   export type CreateMaintenanceRequestDTO = {
-    reason: string;
+    maintenanceReason: string;
     rentId: string;
     userId: string;
+    maintenanceDate: Date;
   };
   
   export type UpdateMaintenanceRequestDTO = {
-    requestId: string;
-    reason: string;
+    maintenanceStatus: string;
+    maintenanceId: string;
   };
   

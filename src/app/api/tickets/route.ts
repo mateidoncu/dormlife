@@ -9,7 +9,7 @@ export async function GET(
 
   try {
     const userTickets = await getTickets(userId);
-
+    
     return NextResponse.json(userTickets, {
       status: 200,
       statusText: 'Successful',

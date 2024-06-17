@@ -6,20 +6,20 @@ import axios from 'axios';
 import { getUserRents } from '@/libs/api';
 import { User } from '@/models/user';
 import LoadingSpinner from '../../loading';
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import { BsJournalBookmarkFill } from 'react-icons/bs';
+import { MdOutlineReportProblem } from "react-icons/md";
 import { GiMoneyStack } from 'react-icons/gi';
 import Table from '@/components/Table/Table';
 import Chart from '@/components/Chart/Chart';
+import RequestTable from '@/components/RequestTable/RequestTable'; // Import the RequestTable component
 
 const UserDetails = (props: { params: { id: string } }) => {
   const {
     params: { id: userId },
   } = props;
 
-  const [currentNav, setCurrentNav] = useState<
-    'rents' | 'amount'
-  >('rents');
+  const [currentNav, setCurrentNav] = useState<'rents' | 'amount' | 'requests'>('rents'); // Added 'requests'
   const [roomId, setRoomId] = useState<string | null>(null);
 
   const fetchUserRent = async () => getUserRents(userId);
@@ -134,6 +134,21 @@ const UserDetails = (props: { params: { id: string } }) => {
                 </a>
               </li>
             </ol>
+            <ol
+              className={`${
+                currentNav === 'requests' ? 'text-primary_dark' : 'text-gray-700'
+              } inline-flex mr-1 md:mr-5 items-center space-x-1 md:space-x-3`}
+            >
+              <li
+                onClick={() => setCurrentNav('requests')}
+                className='inline-flex items-center cursor-pointer'
+              >
+                <MdOutlineReportProblem />
+                <a className='inline-flex items-center mx-1 md:mx-3 text-xs md:text-sm font-medium'>
+                  Issues
+                </a>
+              </li>
+            </ol>
           </nav>
 
           {currentNav === 'rents' ? (
@@ -143,12 +158,14 @@ const UserDetails = (props: { params: { id: string } }) => {
                 setRoomId={setRoomId}
               />
             )
-          ) : (
-            <></>
-          )}
-
-          {currentNav === 'amount' ? (
+          ) : currentNav === 'amount' ? (
             userRents && <Chart userRents={userRents} />
+          ) : currentNav === 'requests' ? (
+            <RequestTable maintenanceDetails={[]} setMaintenanceRequestId={function (value: SetStateAction<string | null>): void {
+                  throw new Error('Function not implemented.');
+                } } ticketDetails={[]} setTicketId={function (value: SetStateAction<string | null>): void {
+                  throw new Error('Function not implemented.');
+                } } /> // Include the RequestTable component
           ) : (
             <></>
           )}

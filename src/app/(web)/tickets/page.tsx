@@ -6,7 +6,7 @@ import ListTickets from '@/components/ListTickets/ListTickets';
 import axios from 'axios';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 const fetchUserData = async () => {
   const { data } = await axios.get('/api/users');
@@ -25,20 +25,27 @@ const TicketsPage = () => {
 
   const { data: session } = useSession();
 
-  const { data: userData, error: userError } = useSWR('/api/users', fetchUserData, { onSuccess: (data) => setUserId(data._id) });
+  const { data: userData, error: userError } = useSWR('/api/users', fetchUserData, {
+    onSuccess: (data) => setUserId(data._id),
+  });
 
   const { data: tickets, error: ticketsError } = useSWR(
     userData?.isAdmin ? '/api/tickets' : null,
     fetchTickets
   );
 
-  const submitHandler = async () => {
+  const submitHandler = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    console.log('[Client] Submitting ticket:', { ticketTitle, ticketText, userId });
+
     if (!ticketText.trim().length || !ticketTitle.trim().length) {
-      return toast.error('Please provide a message and title');
+      toast.error('Please provide a message and title');
+      return;
     }
 
     if (!userId) {
-      return toast.error('Id not provided');
+      toast.error('Id not provided');
+      return;
     }
 
     try {
@@ -47,9 +54,10 @@ const TicketsPage = () => {
         ticketTitle,
         userId,
       });
-      console.log(data);
+      console.log('[Client] Ticket created successfully:', data);
       toast.success('Ticket Submitted');
     } catch (error) {
+      console.error('[Client] Ticket creation failed:', error);
       toast.error('Ticket Failed');
     } finally {
       setTimeout(() => {
@@ -84,7 +92,10 @@ const TicketsPage = () => {
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
       {userData?.isAdmin ? (
-        <ListTickets tickets={tickets} error={ticketsError} />
+        <ListTickets 
+          tickets={tickets} 
+          error={ticketsError} 
+        />
       ) : (
         <CreateTicket
           ticketText={ticketText}

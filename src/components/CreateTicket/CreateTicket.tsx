@@ -1,13 +1,13 @@
 'use client';
 
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react';
 
 type Props = {
     ticketTitle: string;
     setTicketTitle: Dispatch<SetStateAction<string>>;
     ticketText: string;
     setTicketText: Dispatch<SetStateAction<string>>;
-    submitHandler: () => Promise<string | undefined>;
+    submitHandler: (e: FormEvent) => Promise<void>;
 };  
 
 const CreateTicket: FC<Props> = props => {

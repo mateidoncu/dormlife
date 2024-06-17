@@ -19,11 +19,6 @@ export default defineType({
       validation: Rule => Rule.required(),
     }),
     defineField({
-      name: 'createdAt',
-      title: 'Created At',
-      type: 'datetime',
-    }),
-    defineField({
       name: 'updatedAt',
       title: 'Updated At',
       type: 'datetime',
@@ -34,9 +29,9 @@ export default defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Pending', value: 'pending' },
+          { title: 'Open', value: 'open' },
           { title: 'In Progress', value: 'in-progress' },
-          { title: 'Completed', value: 'completed' }
+          { title: 'Closed', value: 'closed' }
         ]
       }
     }),
@@ -45,6 +40,12 @@ export default defineType({
       title: 'User',
       type: 'reference',
       to: [{ type: 'user' }],
+      validation: Rule => Rule.required(),
+    }),
+    defineField({
+      name: 'scheduledDate',
+      title: 'Scheduled Date',
+      type: 'datetime',
       validation: Rule => Rule.required(),
     })
   ],

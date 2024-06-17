@@ -1,37 +1,25 @@
 import { FC, useEffect, useState } from 'react';
 import { MaintenanceRequest } from '@/models/maintenance';
-import { getMaintenanceRequests, respondToMaintenanceRequest } from '@/libs/api';
-import { useSession } from 'next-auth/react';
 
-const ViewMaintenanceRequests: FC = () => {
-  const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
-  const [response, setResponse] = useState<string>('');
-  const { data: session } = useSession();
+type ViewMaintenanceRequestsProps = {
+  maintenanceRequests: MaintenanceRequest[];
+  error: any;
+};
 
-  useEffect(() => {
-    const fetchRequests = async () => {
-      const fetchedRequests = await getMaintenanceRequests();
-      setRequests(fetchedRequests);
-    };
-    fetchRequests();
-  }, []);
 
-  const handleResponse = async (requestId: string, response: string) => {
-    await respondToMaintenanceRequest(requestId, response);
-    const updatedRequests = requests.map(request => request._id === requestId ? { ...request, response } : request);
-    setRequests(updatedRequests);
-  };
+const ViewMaintenanceRequests: FC<ViewMaintenanceRequestsProps> = ({ maintenanceRequests, error }) => {
+  if (error) return <div>Failed to load maintenance requests</div>;
 
   return (
     <div>
       <h1>All Maintenance Requests</h1>
       <ul>
-        {requests.map(request => (
-          <li key={request._id}>
-            <h2>{request.reason}</h2>
-            <p>Status: {request.status}</p>
-            <textarea onChange={(e) => setResponse(e.target.value)} />
-            <button onClick={() => handleResponse(request._id, response)}>Respond</button>
+        {maintenanceRequests.map(maintenanceRequest => (
+          <li key={maintenanceRequest._id}>
+            <h2>{maintenanceRequest.reason}</h2>
+            <p>Status: {maintenanceRequest.status}</p>
+            {/* <textarea onChange={(e) => setResponse(e.target.value)} />
+            <button onClick={() => handleResponse(request._id, response)}>Respond</button> */}
           </li>
         ))}
       </ul>
