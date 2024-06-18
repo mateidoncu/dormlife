@@ -14,13 +14,13 @@ const RoomCard: FC<Props> = props => {
     
     return (
         <div className="rounded-xl w-72 mb-10 mx-auto md:mx-0 overflow-hidden text-black">
-            <div className="h-60 overflow-hidden">
+            <div className="h-60 relative overflow-hidden">
                 <Image 
-                src={coverImage.url} 
-                alt={name} 
-                width={270} 
-                height={250} 
-                className="img scale-animation" 
+                    src={coverImage.url} 
+                    alt={name} 
+                    layout="fill" 
+                    objectFit="cover"
+                    className="hover:scale-125 transition duration-500 cursor-pointer rounded-xl" 
                 />
             </div>
             

@@ -1,11 +1,17 @@
 import { getMaintenanceRequests } from '@/libs/api';
+import { authOptions } from '@/libs/auth';
+import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const userId = params.id;
+export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    console.error('[API] Authentication required');
+    return new NextResponse('Authentication Required', { status: 500 });
+  }
+
+  const userId = session.user.id;
 
   try {
     const userMaintenanceRequests = await getMaintenanceRequests(userId);

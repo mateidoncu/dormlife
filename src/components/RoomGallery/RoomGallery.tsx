@@ -43,9 +43,10 @@ const RoomGallery: FC<{ photos: ImageType[] }> = ({ photos }) => {
             <Image
               src={photos[0].url}
               alt={`Room Photo ${currentPhotoIndex + 1}`}
-              className='img scale-animation cursor-pointer'
-              width={150}
-              height={150}
+              className='hover:scale-125 transition duration-500 cursor-pointer rounded-xl'
+              layout='fill'
+              objectFit='cover'
+              quality={100}
               onClick={openModal.bind(this, 0)}
             />
           </div>
@@ -53,49 +54,43 @@ const RoomGallery: FC<{ photos: ImageType[] }> = ({ photos }) => {
             <Image
               src={photos[currentPhotoIndex].url}
               alt={`Room Photo ${currentPhotoIndex + 1}`}
-              className='img'
-              width={150}
-              height={150}
+              className='img w-full'
+              layout='fill'
+              objectFit='cover'
+              quality={100}
               onClick={openModal.bind(this, 0)}
             />
           </div>
         </div>
-        <div className='md:hidden flex justify-between items-center'>
-          <div className='flex space-x-2'>
-            <FaArrowLeft className='cursor-pointer' onClick={handlePrevious} />
-            <FaArrowRight className='cursor-pointer' onClick={handleNext} />
-          </div>
-          <span>
-            {currentPhotoIndex + 1} / {photos.length}
-          </span>
-        </div>
-
-        <div className='hidden md:grid grid-cols-2 h-full gap-5'>
-          {displayPhotos.map((photo, index) => (
+        <div className='md:grid grid-rows-2 h-full gap-5'>
+          {displayPhotos.slice(0, 2).map((photo, index) => (
             <div
               key={index}
               className='cursor-pointer h-64 rounded-2xl overflow-hidden'
+              onClick={openModal.bind(this, index + 1)}
             >
               <Image
                 width={150}
                 height={150}
                 src={photo.url}
                 alt={`Room Photo ${index + 2}`}
-                className='img scale-animation'
+                className='hover:scale-125 transition duration-500 cursor-pointer rounded-xl w-full h-full object-cover'
+                quality={100}
               />
             </div>
           ))}
           {remainingPhotosCount > 0 && (
             <div
               className='cursor-pointer relative h-64 rounded-2xl overflow-hidden'
-              onClick={openModal.bind(this, maximumVisiblePhotos)}
+              onClick={openModal.bind(this, maximumVisiblePhotos - 1)}
             >
               <Image
                 width={150}
                 height={150}
                 src={photos[maximumVisiblePhotos - 1].url}
                 alt={`Room Photo ${maximumVisiblePhotos}`}
-                className='img'
+                className='img w-full h-full object-cover'
+                quality={100}
               />
               <div className='absolute cursor-pointer text-white inset-0 flex justify-center bg-[rgba(0,0,0,0.5)] items-center text-2xl'>
                 + {remainingPhotosCount}
@@ -106,36 +101,32 @@ const RoomGallery: FC<{ photos: ImageType[] }> = ({ photos }) => {
 
         {showModal && (
           <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-90 z-[55]'>
-            <div className='h-[75vh] w-[320px] md:w-[700px] relative'>
-              <Image
-                src={photos[currentPhotoIndex].url}
-                alt={`Room Photo ${currentPhotoIndex + 1}`}
-                width={150}
-                height={150}
-                className='img'
-              />
-              <div className='flex justify-between items-center py-3'>
-                <div className='flex space-x-2 items-center text-white'>
-                  <FaArrowLeft
-                    className='cursor-pointer'
-                    onClick={handlePrevious}
-                  />
-                  <FaArrowRight
-                    className='cursor-pointer'
-                    onClick={handleNext}
-                  />
-                </div>
-                <span className='text-white text-sm'>
-                  {currentPhotoIndex + 1} / {photos.length}
-                </span>
+            <button
+              className='absolute top-2 right-2 text-white text-lg z-[60]'
+              onClick={closeModal}
+            >
+              <MdCancel className='font-medium text-2xl text-tertiary-dark' />
+            </button>
+            <FaArrowLeft
+              className='cursor-pointer text-white text-3xl absolute left-4 z-[60]'
+              onClick={handlePrevious}
+            />
+            <div className='relative w-full h-full max-w-4xl flex justify-center items-center z-[50]'>
+              <div className='relative w-full h-full flex justify-center items-center'>
+                <Image
+                  src={photos[currentPhotoIndex].url}
+                  alt={`Room Photo ${currentPhotoIndex + 1}`}
+                  layout='fill'
+                  objectFit='contain'
+                  className='max-h-[75vh] max-w-[90vw]'
+                  quality={100}
+                />
               </div>
-              <button
-                className='absolute top-2 right-2 text-white text-lg'
-                onClick={closeModal}
-              >
-                <MdCancel className='font-medium text-2xl text-tertiary-dark' />
-              </button>
             </div>
+            <FaArrowRight
+              className='cursor-pointer text-white text-3xl absolute right-4 z-[60]'
+              onClick={handleNext}
+            />
           </div>
         )}
       </div>
