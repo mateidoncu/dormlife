@@ -103,11 +103,9 @@ export async function getUserData(userId: string) {
   return result;
 }
 
-export async function checkTicketExists(
-  userId: string,
-): Promise<null | { _id: string }> {
-  console.log('[API] Checking if ticket exists for user:', userId);
-  const query = `*[_type == 'ticket' && user._ref == $userId][0] {
+export async function checkTicketExists(userId: string): Promise<null | { _id: string }> {
+  console.log('[API] Checking if open ticket exists for user:', userId);
+  const query = `*[_type == 'ticket' && user._ref == $userId && status == 'open'][0] {
     _id
   }`;
 
@@ -116,8 +114,8 @@ export async function checkTicketExists(
   };
 
   const result = await sanityClient.fetch(query, params);
-  console.log('[API] Check ticket exists result:', result);
-  return result ? result : null;
+  console.log('[API] Check open ticket exists result:', result);
+  return null; // Always return null to force the creation of a new ticket
 }
 
 export const updateTicket = async ({
@@ -192,9 +190,28 @@ export const createTicket = async ({
   }
 };
 
-export async function getTickets(userId: string) {
+export async function getTickets() {
   const result = await sanityClient.fetch<Ticket[]>(
-    queries.getTicketsQuery,
+    queries.getTicketsQuery, 
+    {}, 
+    { cache: 'no-cache' }
+  );
+  console.log('API fetched tickets:', JSON.stringify(result, null, 2));
+  return result;
+}
+
+export async function getTicket(userId: string, ticketId: string) {
+  const result = await sanityClient.fetch<Ticket>(
+    queries.getTicket, 
+    { userId, ticketId },
+    { cache: 'no-cache' }
+  );
+  return result;
+}
+
+export async function getUserTickets(userId: string) {
+  const result = await sanityClient.fetch<Ticket[]>(
+    queries.getUserTicketsQuery,
     {
       userId,
     },
@@ -204,6 +221,30 @@ export async function getTickets(userId: string) {
   return result;
 }
 
+
+export const updateTicketMessage = async (ticketId: string, { message, status }: { message: string, status: string }) => {
+  const mutation = {
+    mutations: [
+      {
+        patch: {
+          id: ticketId,
+          set: {
+            message,
+            status,
+            updatedAt: new Date().toISOString(),
+          },
+        },
+      },
+    ],
+  };
+
+  const { data } = await axios.post(
+    `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-10-21/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`,
+    mutation,
+    { headers: { Authorization: `Bearer ${process.env.SANITY_TOKEN}` } }
+  );
+  return data;
+};
 
 export async function checkMaintenanceExists(
   userId: string,
@@ -219,12 +260,12 @@ export async function checkMaintenanceExists(
 
   const result = await sanityClient.fetch(query, params);
   console.log('[API] Check maintenance request exists result:', result);
-  return result ? result : null;
+  return null;
 }
 
 export const updateMaintenanceRequest = async ({
-  maintenanceStatus,
   maintenanceId,
+  maintenanceStatus,
 }: UpdateMaintenanceRequestDTO) => {
   const mutation = {
     mutations: [
@@ -239,7 +280,7 @@ export const updateMaintenanceRequest = async ({
       },
     ],
   };
-
+  
   console.log('[API] Updating maintenance request with mutation:', JSON.stringify(mutation, null, 2));
   try {
     const { data } = await axios.post(
@@ -298,9 +339,9 @@ export const createMaintenanceRequest = async ({
   }
 };
 
-export async function getMaintenanceRequests(userId: string) {
-  const result = await sanityClient.fetch<MaintenanceRequest[]>(
-    queries.getMaintenanceQuery,
+export async function getMaintenanceRequest(userId: string) {
+  const result = await sanityClient.fetch<MaintenanceRequest>(
+    queries.getMaintenanceRequestQuery,
     {
       userId,
     },
@@ -308,4 +349,40 @@ export async function getMaintenanceRequests(userId: string) {
   );
 
   return result;
-}
+};
+
+export async function getMaintenanceRequests() {
+  const result = await sanityClient.fetch<MaintenanceRequest[]>(
+    queries.getMaintenanceRequestsQuery,
+    {},
+    { cache: 'no-cache' }
+  );
+
+  return result;
+};
+
+export async function getUserMaintenanceRequests(userId: string) {
+  const result = await sanityClient.fetch<MaintenanceRequest[]>(
+    queries.getUserMaintenanceRequestsQuery,
+    {
+      userId,
+    },
+    { cache: 'no-cache' }
+  );
+
+  return result;
+};
+
+export async function getMaintenanceRequestById(maintenanceId: string) {
+  const result = await sanityClient.fetch<MaintenanceRequest[]>(
+    queries.getMaintenanceRequestByIdQuery,
+    {
+      maintenanceId,
+    },
+    { cache: 'no-cache' }
+  );
+
+  return result;
+};
+
+

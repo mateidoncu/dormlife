@@ -1,9 +1,7 @@
-'use client';
-
+"use client";
 import useSWR from 'swr';
 import axios from 'axios';
-
-import { getUserRents } from '@/libs/api';
+import { getUserMaintenanceRequests, getUserRents, getUserTickets } from '@/libs/api';
 import { User } from '@/models/user';
 import LoadingSpinner from '../../loading';
 import { SetStateAction, useState } from 'react';
@@ -13,6 +11,8 @@ import { GiMoneyStack } from 'react-icons/gi';
 import Table from '@/components/Table/Table';
 import Chart from '@/components/Chart/Chart';
 import RequestTable from '@/components/RequestTable/RequestTable'; // Import the RequestTable component
+import { Ticket } from '@/models/ticket';
+import { MaintenanceRequest } from '@/models/maintenance';
 
 const UserDetails = (props: { params: { id: string } }) => {
   const {
@@ -23,10 +23,16 @@ const UserDetails = (props: { params: { id: string } }) => {
   const [roomId, setRoomId] = useState<string | null>(null);
 
   const fetchUserRent = async () => getUserRents(userId);
+
   const fetchUserData = async () => {
     const { data } = await axios.get<User>('/api/users');
     return data;
   };
+
+  const fetchUserTickets = async () => getUserTickets(userId);
+
+  const fetchUserMaintenanceRequests = async () => getUserMaintenanceRequests(userId);
+
 
   const {
     data: userRents,
@@ -40,6 +46,20 @@ const UserDetails = (props: { params: { id: string } }) => {
     error: errorGettingUserData,
   } = useSWR('/api/users', fetchUserData);
 
+
+  const {
+    data: userTickets = [],
+    isLoading: loadingUserTickets,
+    error: errorGettingUserTickets,
+  } = useSWR<Ticket[]>(`get/tickets`, fetchUserTickets);
+
+  const {
+    data: userMaintenanceRequests = [],
+    isLoading: loadingUserMaintenanceRequests,
+    error: errorGettingUserMaintenanceRequests,
+  } = useSWR<MaintenanceRequest[]>(`get/maintenance`, fetchUserMaintenanceRequests);
+
+
   if (error || errorGettingUserData) throw new Error('Cannot fetch data');
   if (typeof userRents === 'undefined' && !isLoading)
     throw new Error('Cannot fetch data');
@@ -47,7 +67,6 @@ const UserDetails = (props: { params: { id: string } }) => {
     throw new Error('Cannot fetch data');
 
   if (loadingUserData) return <LoadingSpinner />;
-  if (!userData) throw new Error('Cannot fetch data');
   if (!userData) throw new Error('Cannot fetch data');
 
   return (
@@ -161,11 +180,11 @@ const UserDetails = (props: { params: { id: string } }) => {
           ) : currentNav === 'amount' ? (
             userRents && <Chart userRents={userRents} />
           ) : currentNav === 'requests' ? (
-            <RequestTable maintenanceDetails={[]} setMaintenanceRequestId={function (value: SetStateAction<string | null>): void {
+            <RequestTable maintenanceDetails={userMaintenanceRequests} setMaintenanceRequestId={function (value: SetStateAction<string | null>): void {
                   throw new Error('Function not implemented.');
-                } } ticketDetails={[]} setTicketId={function (value: SetStateAction<string | null>): void {
+                } } ticketDetails={userTickets} setTicketId={function (value: SetStateAction<string | null>): void {
                   throw new Error('Function not implemented.');
-                } } /> // Include the RequestTable component
+                } } /> 
           ) : (
             <></>
           )}

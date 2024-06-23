@@ -20,10 +20,10 @@ export async function GET(req: Request) {
 
   try {
     const data = await getUserData(userId);
-    console.log('[API] User data fetched successfully:', data);
+    // console.log('[API] User data fetched successfully:', data);
     return NextResponse.json(data, { status: 200, statusText: 'Successful' });
   } catch (error) {
-    console.error('[API] Unable to fetch user data:', error);
+    // console.error('[API] Unable to fetch user data:', error);
     return new NextResponse('Unable to fetch', { status: 400 });
   }
 }
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     const alreadyExists = await checkTicketExists(userId);
-    console.log('[API] Ticket exists:', alreadyExists);
+    console.log('[API] Open ticket exists:', alreadyExists);
 
     let data;
 

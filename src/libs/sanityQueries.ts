@@ -53,7 +53,7 @@ export const getUserDataQuery = groq`*[_type == 'user' && _id == $userId][0] {
     yearOfStudy,
 }`;
 
-export const getTicketsQuery = groq`*[_type == "ticket" && user._ref == $userId] {
+export const getTicket = groq`*[_type == "ticket" && _id == $ticketId][0] {
     _createdAt,
     _id,
     title,
@@ -65,7 +65,31 @@ export const getTicketsQuery = groq`*[_type == "ticket" && user._ref == $userId]
     },
 }`;
 
-export const getMaintenanceQuery = groq`*[_type == "maintenance" && user._ref == $userId && rent._ref == $rentId] {
+export const getTicketsQuery = groq`*[_type == "ticket"] {
+    _createdAt,
+    _id,
+    title,
+    message,
+    status,
+    updatedAt,
+    user -> {
+      name
+    },
+}`;
+
+export const getUserTicketsQuery = groq`*[_type == "ticket" && user._ref == $userId] {
+    _createdAt,
+    _id,
+    title,
+    message,
+    status,
+    updatedAt,
+    user -> {
+      name
+    },
+}`;
+
+export const getMaintenanceRequestQuery = groq`*[_type == "maintenance" && user._ref == $userId && rent._ref == $rentId] {
     _createdAt,
     _id,
     reason,
@@ -80,4 +104,47 @@ export const getMaintenanceQuery = groq`*[_type == "maintenance" && user._ref ==
     },
 }`;
 
-  
+export const getMaintenanceRequestsQuery = groq`*[_type == "maintenance"] {
+    _createdAt,
+    _id,
+    reason,
+    scheduledDate,
+    status,
+    updatedAt,
+    user -> {
+      name
+    },
+    rent -> {
+      _id,
+    },
+}`;
+
+export const getUserMaintenanceRequestsQuery = groq`*[_type == "maintenance" && user._ref == $userId] {
+    _createdAt,
+    _id,
+    reason,
+    scheduledDate,
+    status,
+    updatedAt,
+    user -> {
+      name
+    },
+    rent -> {
+      _id,
+    },
+}`;
+
+export const getMaintenanceRequestByIdQuery = groq`*[_type == "maintenance" && _id == $maintenanceId][0] {
+  _createdAt,
+  _id,
+  reason,
+  scheduledDate,
+  status,
+  updatedAt,
+  user -> {
+    name
+  },
+  rent -> {
+    _id,
+  },
+}`;

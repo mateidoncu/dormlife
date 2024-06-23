@@ -6,15 +6,11 @@ import ListTickets from '@/components/ListTickets/ListTickets';
 import axios from 'axios';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
+import LoadingSpinner from '../loading';
 
 const fetchUserData = async () => {
   const { data } = await axios.get('/api/users');
-  return data;
-};
-
-const fetchTickets = async (url: string) => {
-  const { data } = await axios.get(url);
   return data;
 };
 
@@ -25,15 +21,10 @@ const TicketsPage = () => {
 
   const { data: session } = useSession();
 
-  const { data: userData, error: userError } = useSWR('/api/users', fetchUserData, {
+  const { data: userData, error: userError, isLoading: loadingUserData } = useSWR('/api/users', fetchUserData, {
     onSuccess: (data) => setUserId(data._id),
   });
-
-  const { data: tickets, error: ticketsError } = useSWR(
-    userData?.isAdmin ? '/api/tickets' : null,
-    fetchTickets
-  );
-
+  
   const submitHandler = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     console.log('[Client] Submitting ticket:', { ticketTitle, ticketText, userId });
@@ -89,13 +80,18 @@ const TicketsPage = () => {
     );
   }
 
+  if (loadingUserData) {
+    return <LoadingSpinner />;
+  }
+
+  if (userError) {
+    return <div>Failed to load user data</div>;
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
       {userData?.isAdmin ? (
-        <ListTickets 
-          tickets={tickets} 
-          error={ticketsError} 
-        />
+        <ListTickets />
       ) : (
         <CreateTicket
           ticketText={ticketText}

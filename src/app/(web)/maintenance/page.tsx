@@ -1,13 +1,13 @@
 'use client';
 
 import CreateMaintenanceRequest from '@/components/CreateMaintenance/CreateMaintenance';
-import ViewMaintenanceRequests from '@/components/ViewMaintenance/ViewMaintenance';
-import { getUserRents } from '@/libs/api';
+import MaintenanceRequestsList from '@/components/MaintenanceList/MaintenanceList';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { FormEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import useSWR from 'swr';
+import LoadingSpinner from '../loading';
 
 const fetchUserData = async () => {
   const { data } = await axios.get('/api/users');
@@ -32,7 +32,7 @@ const MaintenancePage = () => {
   
   const { data: session } = useSession();
   
-  const { data: userData, error: userError } = useSWR('/api/users', fetchUserData, {
+  const { data: userData, error: userError, isLoading: loadingUserData } = useSWR('/api/users', fetchUserData, {
     onSuccess: (data) => setUserId(data._id) 
   });
 
@@ -112,12 +112,18 @@ const MaintenancePage = () => {
     );
   }
 
+  if (loadingUserData) {
+    return <LoadingSpinner />;
+  }
+
+  if (userError) {
+    return <div>Failed to load user data</div>;
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
       {userData?.isAdmin ? (
-        <ViewMaintenanceRequests
-          maintenanceRequests={maintenanceRequests}
-          error={maintenanceRequestsError}
+        <MaintenanceRequestsList
         />
       ) : (
         <CreateMaintenanceRequest

@@ -14,8 +14,8 @@ export async function GET(req: Request) {
   const userId = session.user.id;
 
   try {
-    const userTickets = await getTickets(userId);
-    
+    const userTickets = await getTickets();
+    console.log('[API] User tickets fetched successfully:', userTickets);
     return NextResponse.json(userTickets, {
       status: 200,
       statusText: 'Successful',
