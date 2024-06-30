@@ -357,7 +357,7 @@ export async function getMaintenanceRequests() {
     {},
     { cache: 'no-cache' }
   );
-
+  console.log('API fetched requests:', JSON.stringify(result, null, 2));
   return result;
 };
 

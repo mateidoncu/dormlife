@@ -4,6 +4,7 @@ import { authOptions } from '@/libs/auth';
 import {
   checkMaintenanceExists,
   createMaintenanceRequest,
+  getMaintenanceRequests,
   updateMaintenanceRequest,
 } from '@/libs/api';
 
@@ -48,5 +49,15 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('[API] Unable to create maintenance request:', error);
     return new NextResponse('Unable to create maintenance request', { status: 400 });
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const maintenanceRequests = await getMaintenanceRequests();
+    return NextResponse.json(maintenanceRequests);
+  } catch (error) {
+    console.error('Unable to fetch maintenance requests', error);
+    return new NextResponse('Unable to fetch maintenance requests', { status: 400 });
   }
 }

@@ -47,7 +47,11 @@ const MaintenancePage = () => {
 
   const { data: maintenanceRequests, error: maintenanceRequestsError } = useSWR(
     userData?.isAdmin ? '/api/maintenance' : null,
-    fetchMaintenanceRequests
+    fetchMaintenanceRequests,
+    {
+      revalidateOnFocus: true, // Ensures data is re-fetched when window is focused
+      refreshInterval: 1000, // Automatically refresh data every 5 seconds
+    }
   );
 
   const submitHandler = async (e: FormEvent): Promise<void> => {
@@ -66,7 +70,7 @@ const MaintenancePage = () => {
 
     if (!rentId) {
       console.log('Rent Data:', rentData);
-      toast.error('Rent Id not provided');
+      toast.error('No room rented by user');
       return;
     }
 

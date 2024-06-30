@@ -14,6 +14,12 @@ const fetchUserData = async () => {
   return data;
 };
 
+const fetchTickets = async (url: string) => {
+  const { data } = await axios.get(url);
+  return data;
+};
+
+
 const TicketsPage = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [ticketTitle, setTicketTitle] = useState('');
@@ -24,6 +30,16 @@ const TicketsPage = () => {
   const { data: userData, error: userError, isLoading: loadingUserData } = useSWR('/api/users', fetchUserData, {
     onSuccess: (data) => setUserId(data._id),
   });
+
+  const { data: tickets, error: ticketsError } = useSWR(
+    userData?.isAdmin ? '/api/tickets' : null,
+    fetchTickets,
+    {
+      revalidateOnFocus: true, // Ensures data is re-fetched when window is focused
+      refreshInterval: 1000, // Automatically refresh data every 5 seconds
+    }
+  );
+
   
   const submitHandler = async (e: FormEvent): Promise<void> => {
     e.preventDefault();

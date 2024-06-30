@@ -16,10 +16,7 @@ export async function GET(req: Request) {
   try {
     const userTickets = await getTickets();
     console.log('[API] User tickets fetched successfully:', userTickets);
-    return NextResponse.json(userTickets, {
-      status: 200,
-      statusText: 'Successful',
-    });
+    return NextResponse.json(userTickets);
   } catch (error) {
     console.log('Getting Ticket Failed', error);
     return new NextResponse('Unable to fetch', { status: 400 });

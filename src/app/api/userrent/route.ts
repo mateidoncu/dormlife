@@ -15,7 +15,6 @@ export async function GET(req: Request) {
 
   try {
     const data = await getUserRents(userId);
-    console.log('[API] User rent data fetched successfully:', data);
     return NextResponse.json(data, { status: 200, statusText: 'Successful' });
   } catch (error) {
     console.error('[API] Unable to fetch user rent data:', error);

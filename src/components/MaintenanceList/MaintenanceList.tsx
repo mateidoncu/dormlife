@@ -11,8 +11,7 @@ const MaintenanceList = () => {
     return getMaintenanceRequests();
   }
 
-  const { data: maintenanceRequests, error, isLoading } = useSWR<MaintenanceRequest[]>("get/maintenance", fetchMaintenanceRequests);
-
+  const { data: maintenanceRequests, error, isLoading } = useSWR('/api/maintenance', fetchMaintenanceRequests);
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Failed to load maintenance requests</div>;
 

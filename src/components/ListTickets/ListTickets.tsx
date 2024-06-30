@@ -11,7 +11,7 @@ const ListTickets = () => {
     return tickets;
   };
 
-  const { data: tickets, error, isLoading } = useSWR<Ticket[]>("get/tickets", fetchTickets);
+  const { data: tickets, error, isLoading } = useSWR<Ticket[]>("/api/tickets", fetchTickets);
   if (error) return <div>Failed to load tickets</div>;
 
   return (
