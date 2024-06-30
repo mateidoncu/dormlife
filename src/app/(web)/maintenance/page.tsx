@@ -45,7 +45,7 @@ const MaintenancePage = () => {
     }
   });
 
-  const { data: maintenanceRequests, error: maintenanceRequestsError } = useSWR(
+  const { data: maintenanceRequests, error: maintenanceRequestsError, isLoading: loadingMaintenanceRequests } = useSWR(
     userData?.isAdmin ? '/api/maintenance' : null,
     fetchMaintenanceRequests,
     {
@@ -116,7 +116,7 @@ const MaintenancePage = () => {
     );
   }
 
-  if (loadingUserData) {
+  if (loadingUserData || loadingMaintenanceRequests) {
     return <LoadingSpinner />;
   }
 

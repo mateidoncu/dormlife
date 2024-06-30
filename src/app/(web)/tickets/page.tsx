@@ -31,7 +31,7 @@ const TicketsPage = () => {
     onSuccess: (data) => setUserId(data._id),
   });
 
-  const { data: tickets, error: ticketsError } = useSWR(
+  const { data: tickets, error: ticketsError, isLoading: loadingTickets } = useSWR(
     userData?.isAdmin ? '/api/tickets' : null,
     fetchTickets,
     {
@@ -96,7 +96,7 @@ const TicketsPage = () => {
     );
   }
 
-  if (loadingUserData) {
+  if (loadingUserData || loadingTickets) {
     return <LoadingSpinner />;
   }
 
