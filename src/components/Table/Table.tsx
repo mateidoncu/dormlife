@@ -47,7 +47,7 @@ const Table: FC<Props> = ({ rentDetails, setRoomId }) => {
               >
                 {rent.dormRoom.name}
               </th>
-              <td className='px-6 py-4'>{rent.dormRoom.price}</td>
+              <td className='px-6 py-4'>{rent.price}</td>
               <td className='px-6 py-4'>{rent.numberOfMonths}</td>
               <td className='px-6 py-4'>
                 {calcNoOfDays(rent.contractStartDate, rent.contractEndDate)}
