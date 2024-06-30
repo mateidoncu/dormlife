@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { getRoom } from "@/libs/api";
 import useSWR from "swr";
@@ -81,7 +81,7 @@ const RoomPage = (props: {params: {slug: string} }) => {
             }
         } catch (error) {
             console.log('Error: ', error);
-            toast.error('An error occured');
+            toast.error('An error occurred');
         }
     };
 
@@ -94,7 +94,7 @@ const RoomPage = (props: {params: {slug: string} }) => {
     };
 
     const calcNumMonths = () => {
-        if (!contractStartDate || !contractEndDate) return;
+        if (!contractStartDate || !contractEndDate) return 0;
     
         const startDate = new Date(contractStartDate);
         const endDate = new Date(contractEndDate);
@@ -197,6 +197,7 @@ const RoomPage = (props: {params: {slug: string} }) => {
                         isOccupied={room.isOccupied}
                         handleRentClick={handleRentClick}
                         handleRentClickNotLoggedIn={handleRentClickNotLoggedIn}
+                        calcNumMonths={calcNumMonths} // Pass calcNumMonths to RentRoom
                         />
                     </div>
                 </div>

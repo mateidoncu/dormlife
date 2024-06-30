@@ -50,7 +50,7 @@ export async function POST(req: Request, res: Response) {
 
   try {
     const room = await getRoom(dormRoomSlug);
-    const price = room.price;
+    const price = room.price * numberOfMonths;
 
     // Create a stripe payment
     const stripeSession = await stripe.checkout.sessions.create({
